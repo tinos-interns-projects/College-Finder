@@ -7,9 +7,8 @@ from google.genai import types
 from .models import CollegeCourse
 from .serializers import CollegeCourseSerializer
 
-# Initialize the Gemini client safely
-# 🚀 REPLACE "your-free-gemini-key-here" with your real key string from AI Studio!
-GEMINI_KEY = os.getenv("GEMINI_API_KEY", "AIzaSyAjxpa5KqF3GCJP7Jw6l7WdiD6IxcySdzY")
+
+GEMINI_KEY = os.getenv("GEMINI_API_KEY", "API_KEY")
 client = genai.Client(api_key=GEMINI_KEY)
 
 
@@ -83,19 +82,15 @@ def chatbot_reply(request):
         print("====================================")
         return Response({"reply": "I'm having a bit of trouble reading your request right now. Could you try asking more simply?"})
 
-    # --- EXECUTE DATABASE QUERIES ENFORCING BOUNDARIES ---
-    # --- EXECUTE DATABASE QUERIES ENFORCING BOUNDARIES ---
-    # --- EXECUTE DATABASE QUERIES ENFORCING BOUNDARIES ---
-    # --- EXECUTE DATABASE QUERIES ENFORCING BOUNDARIES ---
     if matched_state or matched_location or matched_course or matched_program:
-        from django.db.models import Q  # 🚀 Import Q objects for OR queries
+        from django.db.models import Q 
         queryset = CollegeCourse.objects.all()
         
         if matched_state:
             queryset = queryset.filter(state__icontains=matched_state)
             
         if matched_location:
-            # 🚀 CROSS-CHECK SYNONYMS: If the database mixes Bangalore and Bengaluru, catch both!
+            
             if matched_location.lower() in ['bengaluru', 'bangalore', 'banglore']:
                 queryset = queryset.filter(
                     Q(location__icontains='Bengaluru') | 
@@ -120,7 +115,7 @@ def chatbot_reply(request):
         
         results = queryset[:3]
         
-        # 2. 🚀 FALLBACK FILTER: If the strict combined search returns nothing, look for just the course!
+        #  FALLBACK FILTER: If the strict combined search returns nothing, look for just the course!
         if not results and matched_course:
             print(f"Strict search failed for {matched_course} in {matched_location}. Falling back to general course search...")
             results = CollegeCourse.objects.filter(course_name__icontains=matched_course)[:3]
