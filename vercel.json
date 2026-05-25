@@ -1,15 +1,26 @@
 {
-  "experimentalServices": {
-    "frontend": {
-      "root": "frontend",
-      "routePrefix": "/",
-      "framework": "vite"
+  "version": 2,
+  "builds": [
+    {
+      "src": "frontend/package.json",
+      "use": "@vercel/static-build"
     },
-    "backend": {
-      "root": "backend",
-      "routePrefix": "/_/backend",
-      "runtime": "@vercel/python",
-      "entrypoint": "college_finder_backend/wsgi.py"
+    {
+      "src": "backend/college_finder_backend/wsgi.py",
+      "use": "@vercel/python",
+      "config": {
+        "maxDuration": 60
+      }
     }
-  }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "backend/college_finder_backend/wsgi.py"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "frontend/$1"
+    }
+  ]
 }
