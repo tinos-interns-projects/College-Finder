@@ -7,7 +7,12 @@ from google.genai import types
 from .models import CollegeCourse
 from .serializers import CollegeCourseSerializer
 
+<<<<<<< HEAD
 
+=======
+# Initialize the Gemini client safely
+# 🚀 REPLACE "your-free-gemini-key-here" with your real key string from AI Studio!
+>>>>>>> 71dc21094fa81c5aab49a7c4ca410d4bdbe2e3b6
 GEMINI_KEY = os.getenv("GEMINI_API_KEY", "API_KEY")
 client = genai.Client(api_key=GEMINI_KEY)
 
