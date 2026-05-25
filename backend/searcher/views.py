@@ -9,7 +9,7 @@ from .serializers import CollegeCourseSerializer
 
 # Initialize the Gemini client safely
 # 🚀 REPLACE "your-free-gemini-key-here" with your real key string from AI Studio!
-GEMINI_KEY = os.getenv("GEMINI_API_KEY", "AIzaSyAjxpa5KqF3GCJP7Jw6l7WdiD6IxcySdzY")
+GEMINI_KEY = os.getenv("GEMINI_API_KEY", "API_KEY")
 client = genai.Client(api_key=GEMINI_KEY)
 
 
