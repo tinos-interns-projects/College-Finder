@@ -57,7 +57,7 @@ function App() {
     const loadDropdownOptions = async () => {
       try {
         // Fetch the raw, unfiltered backend dataset just to generate dropdown labels
-        const response = await fetch("http://127.0.0.1:8000/api/search/?search=");
+        const response = await fetch("https://college-finder-9nuh.onrender.com/api/search/?search=");
         const allData = await response.json();
 
         // 🚀 Store full array here to preserve options independently of active grid searches
@@ -85,7 +85,7 @@ function App() {
       // SMART FALLBACK: If search bar is empty, use the Course Dropdown selection!
       const activeSearchValue = searchTerm.trim() !== "" ? searchTerm : queryCourse;
 
-      let url = `http://127.0.0.1:8000/api/search/?search=${encodeURIComponent(activeSearchValue)}&state=${queryState}&program_level=${queryProg}`;
+      let url = `https://college-finder-9nuh.onrender.com/api/search/?search=${encodeURIComponent(activeSearchValue)}&state=${queryState}&program_level=${queryProg}`;
 
       const response = await fetch(url);
       const jsonResult = await response.json();
@@ -148,9 +148,9 @@ function App() {
     setMessages(updatedMessages);
     setQuestion("");
     setIsTyping(true); // Turn loading animation ON
-
+    
     try {
-      const response = await fetch("http://127.0.0.1:8000/api/chat/", {
+      const response = await fetch("https://college-finder-9nuh.onrender.com/api/chat/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: userMsg.text }),
@@ -223,7 +223,6 @@ function App() {
             {locations
               .filter(loc => {
                 if (filters.state === "State") return true;
-                // 🚀 Looks at unfiltered masterData copy so choices never vanish prematurely
                 return masterData.some(item => item.state === filters.state && item.location === loc);
               })
               .map((loc, idx) => <option key={idx} value={loc}>{loc}</option>)
@@ -242,7 +241,6 @@ function App() {
             {courses
               .filter(crs => {
                 if (filters.program === "Program") return true;
-                // 🚀 Dependent strictly on Program type out of global data array configurations
                 return masterData.some(item => item.program_level === filters.program && item.course_name === crs);
               })
               .map((crs, idx) => <option key={idx} value={crs}>{crs}</option>)
