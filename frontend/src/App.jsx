@@ -56,7 +56,6 @@ function App() {
   useEffect(() => {
   const loadDropdownOptions = async () => {
     try {
-      // Hit the new optimized metadata endpoint
       const response = await fetch(`${BASE_URL}/api/dropdowns/`);
       const meta = await response.json();
 
@@ -64,11 +63,11 @@ function App() {
       setLocations(meta.locations);
       setPrograms(meta.programs);
       setCourses(meta.courses);
+      setMasterData(meta.mappings); 
     } catch (error) {
       console.error("Error pulling database metadata collections:", error);
     }
   };
-
   loadDropdownOptions();
 }, []);
 
