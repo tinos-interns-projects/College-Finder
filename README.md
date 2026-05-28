@@ -14,7 +14,7 @@ The platform provides a centralized system where users can filter colleges and c
 
 An integrated AI chatbot assists users by answering queries related to colleges, programs, and fees.
 
----
+
 
 ## Features
 
@@ -28,7 +28,7 @@ An integrated AI chatbot assists users by answering queries related to colleges,
 * Full-stack React + Django architecture
 * Cloud deployment support
 
----
+
 
 ## Tech Stack
 
@@ -51,7 +51,7 @@ An integrated AI chatbot assists users by answering queries related to colleges,
 * CSV-based structured dataset
 * SQLite (development)
 
----
+
 
 ## System Workflow
 
@@ -64,7 +64,7 @@ An integrated AI chatbot assists users by answering queries related to colleges,
 7. React frontend renders results in real-time
 8. Chatbot handles user queries interactively
 
----
+
 
 ## Project Structure
 
@@ -77,7 +77,7 @@ Course-Fee-Searcher/
 ├── README.md
 ```
 
----
+
 
 ## Key Functionalities
 
@@ -102,7 +102,7 @@ Course-Fee-Searcher/
 * Handles course and fee-related queries
 * Backend-driven NLP response handling
 
----
+
 
 ## Dataset Information
 
@@ -119,7 +119,6 @@ The dataset was collected from:
 * Standardized column formatting
 * Structured data into searchable fields
 
----
 
 ## Deployment
 
@@ -130,7 +129,7 @@ The project is fully deployed online.
 - Frontend: [Live Demo](https://college-finder-olive-seven.vercel.app/)
 - Backend API: [Render Backend](https://college-finder-9nuh.onrender.com)
 
----
+
 
 ## Challenges Faced
 
@@ -140,7 +139,7 @@ The project is fully deployed online.
 * API communication management
 * Maintaining stable filtering behavior
 
----
+
 
 ## Architectural Evolution
 
@@ -159,7 +158,7 @@ The architecture was later upgraded to an external API-driven NLP solution to:
 * Reduce response errors
 * Simplify backend maintenance
 
----
+
 
 ## Future Improvements
 
@@ -171,7 +170,7 @@ The architecture was later upgraded to an external API-driven NLP solution to:
 * Mobile application support
 * Expanded college database
 
----
+
 
 ## Installation & Setup
 
@@ -181,7 +180,7 @@ The architecture was later upgraded to an external API-driven NLP solution to:
 git clone https://github.com/tinos-interns-projects/College-Finder.git
 ```
 
----
+
 
 ### Frontend Setup
 
@@ -191,7 +190,7 @@ npm install
 npm run dev
 ```
 
----
+
 
 ### Backend Setup
 
@@ -201,10 +200,10 @@ pip install -r requirements.txt
 python manage.py runserver
 ```
 
----
+
 
 ## Author
 
 Developed as part of an internship project focused on improving educational accessibility and course discovery through modern web technologies.
 
----
+
