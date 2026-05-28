@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, useRef } from "react";
+import { useEffect, useMemo, useState, useRef, useCallback } from "react";
 import { FaRobot, FaTimes } from "react-icons/fa";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://college-finder-9nuh.onrender.com";
@@ -30,12 +30,26 @@ function App() {
     sortOrder: "",
   });
 
-  const [states, setStates] = useState([]);
+  // allStates and allPrograms never change — loaded once for the full unfiltered list
+  const [allStates, setAllStates] = useState([]);
+  const [allPrograms, setAllPrograms] = useState([]);
+
+  // locations and courses are dependent on current state/program selection
   const [locations, setLocations] = useState([]);
-  const [programs, setPrograms] = useState([]);
   const [courses, setCourses] = useState([]);
 
   const chatBottomRef = useRef(null);
+
+  // sortedData is derived from data + sortOrder — no extra API call needed
+  const sortedData = useMemo(() => {
+    const rows = [...data];
+    if (filters.sortOrder === "lowToHigh") {
+      rows.sort((a, b) => (a.total_fee || 0) - (b.total_fee || 0));
+    } else if (filters.sortOrder === "highToLow") {
+      rows.sort((a, b) => (b.total_fee || 0) - (a.total_fee || 0));
+    }
+    return rows;
+  }, [data, filters.sortOrder]);
 
   const hasAnyFilter = useMemo(() => {
     return (
@@ -45,7 +59,7 @@ function App() {
       filters.program !== "" ||
       filters.course !== ""
     );
-  }, [appliedQuery, filters]);
+  }, [appliedQuery, filters.state, filters.location, filters.program, filters.course]);
 
   useEffect(() => {
     if (chatBottomRef.current) {
@@ -53,54 +67,64 @@ function App() {
     }
   }, [messages, isTyping, chatOpen]);
 
-  const loadDropdownOptions = async (nextState = filters.state, nextProgram = filters.program) => {
-    try {
-      const params = new URLSearchParams();
-      if (nextState) params.set("state", nextState);
-      if (nextProgram) params.set("program_level", nextProgram);
+  // Load full states + programs once on mount (no filter params)
+  useEffect(() => {
+    const loadBaseDropdowns = async () => {
+      try {
+        const response = await fetch(`${BASE_URL}/api/dropdowns/`);
+        const meta = await response.json();
+        setAllStates(meta.states || []);
+        setAllPrograms(meta.programs || []);
+        setLocations(meta.locations || []);
+        setCourses(meta.courses || []);
+      } catch (error) {
+        console.error("Error loading base dropdown options:", error);
+      }
+    };
+    loadBaseDropdowns();
+  }, []);
 
-      const response = await fetch(`${BASE_URL}/api/dropdowns/?${params.toString()}`);
-      const meta = await response.json();
+  // Load dependent dropdowns (locations, courses) whenever state or program changes
+  useEffect(() => {
+    // Skip on initial mount — the base load above already covers it
+    if (!filters.state && !filters.program) return;
 
-      setStates(meta.states || []);
-      setLocations(meta.locations || []);
-      setPrograms(meta.programs || []);
-      setCourses(meta.courses || []);
-    } catch (error) {
-      console.error("Error loading dropdown options:", error);
-    }
-  };
+    const loadDependentDropdowns = async () => {
+      try {
+        const params = new URLSearchParams();
+        if (filters.state) params.set("state", filters.state);
+        if (filters.program) params.set("program_level", filters.program);
 
-  const runSearch = async (override = {}) => {
-    const finalFilters = { ...filters, ...override };
-    const currentQuery = appliedQuery.trim();
+        const response = await fetch(`${BASE_URL}/api/dropdowns/?${params.toString()}`);
+        const meta = await response.json();
 
+        setLocations(meta.locations || []);
+        setCourses(meta.courses || []);
+      } catch (error) {
+        console.error("Error loading dependent dropdown options:", error);
+      }
+    };
+
+    loadDependentDropdowns();
+  }, [filters.state, filters.program]);
+
+  const runSearch = useCallback(async () => {
     setLoadingResults(true);
     try {
       const params = new URLSearchParams();
 
-      if (currentQuery) params.set("search", currentQuery);
-      if (finalFilters.state) params.set("state", finalFilters.state);
-      if (finalFilters.location) params.set("location", finalFilters.location);
-      if (finalFilters.program) params.set("program_level", finalFilters.program);
-      if (finalFilters.course) params.set("course_name", finalFilters.course);
+      if (appliedQuery) params.set("search", appliedQuery);
+      if (filters.state) params.set("state", filters.state);
+      if (filters.location) params.set("location", filters.location);
+      if (filters.program) params.set("program_level", filters.program);
+      if (filters.course) params.set("course_name", filters.course);
 
       const response = await fetch(`${BASE_URL}/api/search/?${params.toString()}`);
       const result = await response.json();
 
-      if (!response.ok) {
-        throw new Error(result.detail || "Search failed");
-      }
+      if (!response.ok) throw new Error(result.detail || "Search failed");
 
-      let rows = Array.isArray(result) ? [...result] : [];
-
-      if (finalFilters.sortOrder === "lowToHigh") {
-        rows.sort((a, b) => (a.total_fee || 0) - (b.total_fee || 0));
-      } else if (finalFilters.sortOrder === "highToLow") {
-        rows.sort((a, b) => (b.total_fee || 0) - (a.total_fee || 0));
-      }
-
-      setData(rows);
+      setData(Array.isArray(result) ? result : []);
       setHasSearched(true);
     } catch (error) {
       console.error("Search error:", error);
@@ -109,20 +133,17 @@ function App() {
     } finally {
       setLoadingResults(false);
     }
-  };
+  }, [appliedQuery, filters.state, filters.location, filters.program, filters.course]);
 
+  // Only re-run the API search when actual filter/query values change (NOT sortOrder)
   useEffect(() => {
-    loadDropdownOptions(filters.state, filters.program);
-  }, [filters.state, filters.program]);
-
-  useEffect(() => {
-    if (!hasAnyFilter && filters.sortOrder === "") {
+    if (!hasAnyFilter) {
       setHasSearched(false);
       setData([]);
       return;
     }
     runSearch();
-  }, [appliedQuery, filters.state, filters.location, filters.program, filters.course, filters.sortOrder]);
+  }, [appliedQuery, filters.state, filters.location, filters.program, filters.course]);
 
   const handleSearch = () => {
     setAppliedQuery(query.trim());
@@ -207,13 +228,13 @@ function App() {
               setFilters((prev) => ({
                 ...prev,
                 state: e.target.value,
-                location: "",
+                location: "", // reset dependent field
               }))
             }
             className="p-4 rounded-2xl border border-gray-200 bg-[#fafaf7] shadow-sm outline-none focus:border-[#556b2f] transition text-gray-700 font-medium cursor-pointer"
           >
             <option value="">State</option>
-            {states.map((st, idx) => (
+            {allStates.map((st, idx) => (
               <option key={idx} value={st}>
                 {st}
               </option>
@@ -239,13 +260,13 @@ function App() {
               setFilters((prev) => ({
                 ...prev,
                 program: e.target.value,
-                course: "",
+                course: "", // reset dependent field
               }))
             }
             className="p-4 rounded-2xl border border-gray-200 bg-[#fafaf7] shadow-sm outline-none focus:border-[#556b2f] transition text-gray-700 font-medium cursor-pointer"
           >
             <option value="">Program</option>
-            {programs.map((prog, idx) => (
+            {allPrograms.map((prog, idx) => (
               <option key={idx} value={prog}>
                 {prog}
               </option>
@@ -289,8 +310,8 @@ function App() {
           <p className="text-gray-500 col-span-1 md:col-span-2 text-center py-16 font-medium bg-white rounded-3xl border shadow-sm">
             Loading results...
           </p>
-        ) : data.length > 0 ? (
-          data.map((course) => (
+        ) : sortedData.length > 0 ? (
+          sortedData.map((course) => (
             <div
               key={course.id}
               className="bg-white p-6 rounded-2xl border border-gray-200 shadow-md hover:shadow-lg transition duration-200"
@@ -342,11 +363,10 @@ function App() {
             {messages.map((msg, index) => (
               <div
                 key={index}
-                className={`max-w-[85%] px-4 py-3 rounded-2xl text-sm whitespace-pre-line shadow-sm leading-relaxed ${
-                  msg.sender === "user"
+                className={`max-w-[85%] px-4 py-3 rounded-2xl text-sm whitespace-pre-line shadow-sm leading-relaxed ${msg.sender === "user"
                     ? "bg-[#556b2f] text-white ml-auto"
                     : "bg-gray-200 text-gray-800"
-                }`}
+                  }`}
               >
                 {msg.text}
               </div>
