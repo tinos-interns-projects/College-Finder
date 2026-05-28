@@ -188,18 +188,19 @@ function App() {
             <option value="State">State</option>
             {states.map((st, idx) => <option key={idx} value={st}>{st}</option>)}
           </select>
-
+          
           {/* 2. SMART LOCATION SELECT */}
-          <select value={filters.location} onChange={(e) => setFilters({ ...filters, location: e.target.value })} className="p-4 rounded-2xl border border-gray-200 bg-[#fafaf7] shadow-sm outline-none focus:border-[#556b2f] transition text-gray-700 font-medium cursor-pointer">
-            <option value="Location">Location</option>
-            {locations
-              .filter(loc => {
-                if (filters.state === "State") return true; 
-                return masterData.some(item => item.state === filters.state && item.location === loc);
-              })
-              .map((loc, idx) => <option key={idx} value={loc}>{loc}</option>)
-            }
-          </select>
+<select value={filters.location} onChange={(e) => setFilters({ ...filters, location: e.target.value })} className="p-4 rounded-2xl border border-gray-200 bg-[#fafaf7] shadow-sm outline-none focus:border-[#556b2f] transition text-gray-700 font-medium cursor-pointer">
+  <option value="Location">Location</option>
+  {locations
+    .filter(loc => {
+      if (filters.state === "State") return true; 
+      // 🚀 SAFETY GUARD: Only run if masterData is populated
+      return Array.isArray(masterData) && masterData.some(item => item.state === filters.state && item.location === loc);
+    })
+    .map((loc, idx) => <option key={idx} value={loc}>{loc}</option>)
+  }
+</select>
 
           {/* 3. PROGRAM SELECT */}
           <select value={filters.program} onChange={(e) => setFilters({ ...filters, program: e.target.value, course: "Course / Specialization" })} className="p-4 rounded-2xl border border-gray-200 bg-[#fafaf7] shadow-sm outline-none focus:border-[#556b2f] transition text-gray-700 font-medium cursor-pointer">
@@ -208,16 +209,17 @@ function App() {
           </select>
 
           {/* 4. SMART COURSE SELECT */}
-          <select value={filters.course} onChange={(e) => setFilters({ ...filters, course: e.target.value })} className="p-4 rounded-2xl border border-gray-200 bg-[#fafaf7] shadow-sm outline-none focus:border-[#556b2f] transition text-gray-700 font-medium cursor-pointer">
-            <option value="Course / Specialization">Course / Specialization</option>
-            {courses
-              .filter(crs => {
-                if (filters.program === "Program") return true; 
-                return masterData.some(item => item.program_level === filters.program && item.course_name === crs);
-              })
-              .map((crs, idx) => <option key={idx} value={crs}>{crs}</option>)
-            }
-          </select>
+<select value={filters.course} onChange={(e) => setFilters({ ...filters, course: e.target.value })} className="p-4 rounded-2xl border border-gray-200 bg-[#fafaf7] shadow-sm outline-none focus:border-[#556b2f] transition text-gray-700 font-medium cursor-pointer">
+  <option value="Course / Specialization">Course / Specialization</option>
+  {courses
+    .filter(crs => {
+      if (filters.program === "Program") return true; 
+      // 🚀 SAFETY GUARD: Only run if masterData is populated
+      return Array.isArray(masterData) && masterData.some(item => item.program_level === filters.program && item.course_name === crs);
+    })
+    .map((crs, idx) => <option key={idx} value={crs}>{crs}</option>)
+  }
+</select>
 
           {/* 5. SORT ORDER SELECT */}
           <select value={sortOrder} onChange={(e) => setSortOrder(e.target.value)} className="p-4 rounded-2xl border border-gray-200 bg-[#fafaf7] shadow-sm outline-none focus:border-[#556b2f] transition text-gray-700 font-medium cursor-pointer">
