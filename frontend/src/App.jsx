@@ -7,7 +7,7 @@ function App() {
   const [data, setData] = useState([]);
   const [isTyping, setIsTyping] = useState(false);
 
-  // 🚀 UNFILTERED MASTER DATA BACKUP (Fixes the dropdown vanishing bug)
+  // UNFILTERED MASTER DATA BACKUP (Fixes the dropdown vanishing bug)
   const [masterData, setMasterData] = useState([]);
 
   // SEARCH INPUT TRACKING TERMINAL
@@ -151,7 +151,7 @@ function App() {
     setIsTyping(true); // Turn loading animation ON
     
     try {
-      const response = await fetch("${BASE_URL}/api/chat/", {
+      const response = await fetch('${BASE_URL}/api/chat/', {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: userMsg.text }),
