@@ -8,7 +8,9 @@ from .models import CollegeCourse
 from .serializers import CollegeCourseSerializer
 
 
-GEMINI_KEY = os.getenv("GEMINI_API_KEY", "API_KEY")
+GEMINI_KEY = os.getenv("GEMINI_API_KEY")
+if not GEMINI_KEY:
+    raise ValueError("Missing GEMINI_API_KEY")
 client = genai.Client(api_key=GEMINI_KEY)
 
 
