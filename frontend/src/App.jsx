@@ -2,7 +2,8 @@ import { useEffect, useState, useRef } from "react";
 import { FaRobot, FaTimes } from "react-icons/fa";
 
 function App() {
-  // BACKEND COURSE DATA ROWS (Filtered view results)
+  const BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://college-finder-9nuh.onrender.com";
+  
   const [data, setData] = useState([]);
   const [isTyping, setIsTyping] = useState(false);
 
@@ -57,7 +58,7 @@ function App() {
     const loadDropdownOptions = async () => {
       try {
         // Fetch the raw, unfiltered backend dataset just to generate dropdown labels
-        const response = await fetch("https://college-finder-9nuh.onrender.com/api/search/?search=");
+        const response = await fetch(`${BASE_URL}/api/search/?search=`);
         const allData = await response.json();
 
         // 🚀 Store full array here to preserve options independently of active grid searches
@@ -85,7 +86,7 @@ function App() {
       // SMART FALLBACK: If search bar is empty, use the Course Dropdown selection!
       const activeSearchValue = searchTerm.trim() !== "" ? searchTerm : queryCourse;
 
-      let url = `https://college-finder-9nuh.onrender.com/api/search/?search=${encodeURIComponent(activeSearchValue)}&state=${queryState}&program_level=${queryProg}`;
+      let url = `${BASE_URL}/api/search/?search=${encodeURIComponent(activeSearchValue)}&state=${queryState}&program_level=${queryProg}`;
 
       const response = await fetch(url);
       const jsonResult = await response.json();
@@ -150,7 +151,7 @@ function App() {
     setIsTyping(true); // Turn loading animation ON
     
     try {
-      const response = await fetch("https://college-finder-9nuh.onrender.com/api/chat/", {
+      const response = await fetch("${BASE_URL}/api/chat/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: userMsg.text }),
