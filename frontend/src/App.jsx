@@ -53,28 +53,24 @@ function App() {
     }
   }, [messages, isTyping, chatOpen]);
 
-  // EFFECT 1: SYSTEM BOOT INTERCEPTOR (Saves master dataset copy)
   useEffect(() => {
-    const loadDropdownOptions = async () => {
-      try {
-        // Fetch the raw, unfiltered backend dataset just to generate dropdown labels
-        const response = await fetch(`${BASE_URL}/api/search/?search=`);
-        const allData = await response.json();
+  const loadDropdownOptions = async () => {
+    try {
+      // Hit the new optimized metadata endpoint
+      const response = await fetch(`${BASE_URL}/api/dropdowns/`);
+      const meta = await response.json();
 
-        // 🚀 Store full array here to preserve options independently of active grid searches
-        setMasterData(allData);
+      setStates(meta.states);
+      setLocations(meta.locations);
+      setPrograms(meta.programs);
+      setCourses(meta.courses);
+    } catch (error) {
+      console.error("Error pulling database metadata collections:", error);
+    }
+  };
 
-        setStates([...new Set(allData.map(item => item.state).filter(Boolean))].sort());
-        setLocations([...new Set(allData.map(item => item.location).filter(Boolean))].sort());
-        setPrograms([...new Set(allData.map(item => item.program_level).filter(Boolean))].sort());
-        setCourses([...new Set(allData.map(item => item.course_name).filter(Boolean))].sort());
-      } catch (error) {
-        console.error("Error pulling database metadata collections from backend:", error);
-      }
-    };
-
-    loadDropdownOptions();
-  }, []);
+  loadDropdownOptions();
+}, []);
 
   // API SYSTEM CALL FOR PARSING SEARCH VIEWS (Combined text bar + dropdown filters)
   const fetchFilteredData = async () => {
