@@ -6,17 +6,9 @@ function App() {
 
   const [data, setData] = useState([]);
   const [isTyping, setIsTyping] = useState(false);
-
-  // UNFILTERED MASTER DATA BACKUP (Fixes the dropdown vanishing bug)
   const [masterData, setMasterData] = useState([]);
-
-  // SEARCH INPUT TRACKING TERMINAL
   const [searchTerm, setSearchTerm] = useState("");
-
-  // TRACK WHETHER THE USER HAS INITIATED A SEARCH YET
   const [hasSearched, setHasSearched] = useState(false);
-
-  // CHATBOT INTERFACE STATES
   const [chatOpen, setChatOpen] = useState(false);
   const [question, setQuestion] = useState("");
   const [messages, setMessages] = useState([
@@ -26,7 +18,6 @@ function App() {
     },
   ]);
 
-  // UNIFIED DROPDOWN MATRIX FILTER LABELS
   const [filters, setFilters] = useState({
     state: "State",
     location: "Location",
@@ -34,26 +25,20 @@ function App() {
     course: "Course / Specialization",
   });
 
-  // SORT CRITERIA STATE
   const [sortOrder, setSortOrder] = useState("");
-
-  // DYNAMIC MASTER ARRAY STORAGE FROM DATASET
   const [states, setStates] = useState([]);
   const [locations, setLocations] = useState([]);
   const [programs, setPrograms] = useState([]);
   const [courses, setCourses] = useState([]);
 
-  // REFERENCE ANCHOR FOR CHAT STREAM BOTTOM
   const chatBottomRef = useRef(null);
 
-  // AUTOMATIC CHAT CONTAINER SCROLLER LOGIC
   useEffect(() => {
     if (chatBottomRef.current) {
       chatBottomRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [messages, isTyping, chatOpen]);
 
-  // Optimized dropdown option population on boot
   useEffect(() => {
     const loadDropdownOptions = async () => {
       try {
@@ -73,7 +58,6 @@ function App() {
     loadDropdownOptions();
   }, []);
 
-  // API SYSTEM CALL FOR PARSING SEARCH VIEWS
   const fetchFilteredData = async () => {
     try {
       const queryState = filters.state !== "State" ? filters.state : "";
@@ -210,7 +194,7 @@ function App() {
             <option value="Location">Location</option>
             {locations
               .filter(loc => {
-                if (filters.state === "State") return true; // Show all locations if no state is chosen
+                if (filters.state === "State") return true; 
                 return masterData.some(item => item.state === filters.state && item.location === loc);
               })
               .map((loc, idx) => <option key={idx} value={loc}>{loc}</option>)
@@ -228,7 +212,7 @@ function App() {
             <option value="Course / Specialization">Course / Specialization</option>
             {courses
               .filter(crs => {
-                if (filters.program === "Program") return true; // Show all courses if no program is chosen
+                if (filters.program === "Program") return true; 
                 return masterData.some(item => item.program_level === filters.program && item.course_name === crs);
               })
               .map((crs, idx) => <option key={idx} value={crs}>{crs}</option>)
