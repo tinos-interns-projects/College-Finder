@@ -49,8 +49,7 @@ An integrated AI chatbot assists users by answering queries related to colleges,
 ### Database / Dataset
 
 * CSV-based structured dataset
-* SQLite (development)
-
+* SQLite 
 
 
 ## System Workflow
@@ -126,7 +125,7 @@ The project is fully deployed online.
 
 ### Live Links
 
-- Frontend: [Live Demo](https://college-finder-olive-seven.vercel.app/)
+- Frontend: [Live URL](https://college-finder-olive-seven.vercel.app/)
 - Backend API: [Render Backend](https://college-finder-9nuh.onrender.com)
 
 
